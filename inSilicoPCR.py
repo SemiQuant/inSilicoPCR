@@ -61,15 +61,15 @@ def find_compatible_pairs(blast_df, max_len):
         row1 = blast_df.loc[pair[0]]
         row2 = blast_df.loc[pair[1]]
         amp_size = abs(int(row1['Binding Position']) - int(row2['Binding Position']))
-        if amp_size <= max_len and row1['Direction'] != row2['Direction']:
+        if amp_size <= max_len and row1['Direction'] != row2['Direction'] and row1['Subject ID'] == row2['Subject ID']:
             if row1['Direction'] == '+':
                 compatible_pairs.append({'qseq1': row1['Query Seq'], 'qstart1': row1['Query Start'], 'qend1': row1['Query End'], 'direction1': row1['Direction'], 'mismatch1': row1['Mismatches'],
                                          'qseq2': row2['Query Seq'], 'qstart2': row2['Query Start'], 'qend2': row2['Query End'], 'direction2': row2['Direction'], 'mismatch2': row2['Mismatches'],
-                                         'binding_pos_diff': amp_size})
+                                         'binding_pos_diff': amp_size, 'reference': row1['Subject ID']})
             else:
                 compatible_pairs.append({'qseq1': row2['Query Seq'], 'qstart1': row2['Query Start'], 'qend1': row2['Query End'], 'direction1': row2['Direction'], 'mismatch2': row2['Mismatches'],
                                          'qseq2': row1['Query Seq'], 'qstart2': row1['Query Start'], 'qend2': row1['Query End'], 'direction2': row1['Direction'], 'mismatch1': row1['Mismatches'],
-                                         'binding_pos_diff': amp_size})
+                                         'binding_pos_diff': amp_size, 'reference': row1['Subject ID']})
     return pd.DataFrame(compatible_pairs)
 
 with open(primer_seq, 'r') as infile, open(primer_seq+'.fasta', 'w') as outfile:

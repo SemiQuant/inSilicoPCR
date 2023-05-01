@@ -37,3 +37,9 @@ python inSilicoPCR.py \
    --primer_seq ./example/primers.txt \
    --ref_fasta_file  ./example/ref.fasta
 ```
+
+
+|qseq1             |qstart1|qend1|direction1|qseq2            |qstart2|qend2|direction2|mismatch1|mismatch2|binding_pos_diff|reference|
+|:-----------------|------:|----:|:--------:|:----------------|------:|----:|:--------:|-------:|-------:|---------------:|---------------:|
+|gaacaccggcagtggttc|      1|   18|    +     |ctgccgcagcggt     |      1|   13|    -     |       0|       0|             300|example        |
+|accgagctgccggacggcac|      1|   20|    +     |ctgccgcagcggt     |      1|   13|    -     |       0|       0|             318|example      |
