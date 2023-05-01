@@ -1,0 +1,17 @@
+Metadata-Version: 2.1
+Name: PCRinSilico
+Version: 0.0.12
+Summary: In silico PCR tool
+Home-page: https://github.com/SemiQuant/inSilicoPCR
+Author: Jason D Limberis
+Author-email: Jason.Limberis@ucsf.edu
+License: MIT
+Keywords: PCR,in silico PCR
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+
+This script takes a text file with primer sequence (one per line) and a reference FASTA file as input and identifies primer pairs which amplify a DNA sequence of length less than or equal to a user-specified maximum, at a given Tm and salt concentration. The script outputs the sequences of the primers, th eportion of the primer that binds, the number of mismatches, as well as the start and end coordinates of the amplified sequence.
+

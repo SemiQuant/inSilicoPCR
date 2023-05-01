@@ -17,6 +17,16 @@ parser.add_argument('--primer_seq', type=str, help="Primer sequences, one per li
 parser.add_argument('--ref_fasta_file', type=str, help="Reference fasta file", required = True)
 parser.add_argument('--out_file', type=str, help="Output file name", default = "in_silico_PCR")
 
+# check if blastn is in the system path
+try:
+    status = os.system('which blastn > /dev/null 2>&1')
+    if status != 0:
+        print('Error: BLAST is not installed.')
+        exit(1)
+except OSError as e:
+    print('Error:', e)
+    exit(1)
+
 # Check if required arguments are missing and print help message
 args = parser.parse_args()
 if not args.primer_seq or not args.ref_fasta_file:
