@@ -1,3 +1,0 @@
-qseq1	qstart1	qend1	direction1	mismatch2	qseq2	qstart2	qend2	direction2	mismatch1	binding_pos_diff	reference
-gaacaccggcagtggttc	1	18	+	0	ctgccgcagcggt	1	13	-	0	300	example
-accgagctgccggacggcac	1	20	+	0	ctgccgcagcggt	1	13	-	0	318	example
