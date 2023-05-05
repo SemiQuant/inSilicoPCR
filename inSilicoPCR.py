@@ -99,14 +99,19 @@ def find_oligo_dimers(fasta_file, temp, salt_conc):
         if dimer_tm > temp:
             # Add the dimer's names and melting temperature to the lists
             dimers.append((seq1.id, seq2.id))
-            melting_temps.append(dimer_tm)
+            melting_temps.append(round(dimer_tm))
 
     # Create a pandas dataframe from the dimer pairs and melting temperatures
     df = pd.DataFrame({'Sequence1': [d[0] for d in dimers],
                        'Sequence2': [d[1] for d in dimers],
-                       'MeltingTemp': round(melting_temps, 0)})
+                       'MeltingTemp': melting_temps})
 
     return df
+
+def is_valid_dna_sequence(sequence):
+    """Checks if a DNA sequence only contains valid characters."""
+    valid_chars = set('ACGTN')
+    return all(char in valid_chars for char in sequence.upper())
 
 with open(primer_seq, 'r') as infile, open(primer_seq+'.fasta', 'w') as outfile:
     # Initialize a dictionary to keep track of sequence names
@@ -116,10 +121,16 @@ with open(primer_seq, 'r') as infile, open(primer_seq+'.fasta', 'w') as outfile:
         if len(columns) == 1:
             # Remove any leading/trailing whitespace from the sequence
             sequence = line.strip()
+            if not (is_valid_dna_sequence(sequence)):
+                print("error in sequence on: " + line)
+                break
             # Generate a unique sequence name
             name = f'sequence{i}'
         else:
             sequence, name = columns
+            if not (is_valid_dna_sequence(sequence)):
+                print("error in sequence on: " + name)
+                break
         # Check if the name has already been used
         if name in seen_names:
             # Increment the count for this name

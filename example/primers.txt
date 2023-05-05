@@ -3,3 +3,4 @@ ctgccgcagcggt	sge_R
 cgcgcagcacttcgt	kkd_F
 gaacaccggcagtggttc	kkd_F
 accgagctgccggacggcac	kkd_R
+Asgagagaghjkdshklfjhasldkjfh	shoudl_error
