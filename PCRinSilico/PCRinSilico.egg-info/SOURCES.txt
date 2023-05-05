@@ -1,3 +1,4 @@
+README.md
 in_silico_pcr.py
 setup.py
 PCRinSilico.egg-info/PKG-INFO

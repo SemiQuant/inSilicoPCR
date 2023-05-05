@@ -59,7 +59,7 @@ def find_binding_positions(primer_seq, ref_fasta_file, annealing_temp, req_five,
             # Check if primer binds at the specified annealing temperature
             if req_five and int(qstart) >= 2:
                 continue
-            tm = MeltingTemp.Tm_NN(Seq(sseq), Na=salt_conc, Mg=0, dnac1=250, dnac2=0, saltcorr=7, nn_table=MeltingTemp.DNA_NN4, selfcomp=False, check=True, shift=0.0)
+            tm = MeltingTemp.Tm_NN(Seq(sseq), Na=salt_conc, dnac1=250, dnac2=0, saltcorr=7, nn_table=MeltingTemp.DNA_NN4, selfcomp=False, check=True, shift=0.0)
             if annealing_temp <= tm:
                 blast_df.loc[len(blast_df)] = [qseqid, sseqid, qstart, qend, sstart, send, sseq, direction, binding_pos, mismatch, length]
     return blast_df
@@ -75,11 +75,11 @@ def find_compatible_pairs(blast_df, max_len):
             if row1['Direction'] == '+':
                 compatible_pairs.append({'qseq1': row1['Query Seq'], 'qstart1': row1['Query Start'], 'qend1': row1['Query End'], 'direction1': row1['Direction'], 'mismatch1': row1['Mismatches'],
                                          'qseq2': row2['Query Seq'], 'qstart2': row2['Query Start'], 'qend2': row2['Query End'], 'direction2': row2['Direction'], 'mismatch2': row2['Mismatches'],
-                                         'binding_pos_diff': amp_size, 'reference': row1['Subject ID']})
+                                         'binding_pos_diff': amp_size, 'reference': row1['Subject ID'], 'ref_region': str(row2['Binding Position']) + ", " + str(row1['Binding Position'])})
             else:
                 compatible_pairs.append({'qseq1': row2['Query Seq'], 'qstart1': row2['Query Start'], 'qend1': row2['Query End'], 'direction1': row2['Direction'], 'mismatch2': row2['Mismatches'],
                                          'qseq2': row1['Query Seq'], 'qstart2': row1['Query Start'], 'qend2': row1['Query End'], 'direction2': row1['Direction'], 'mismatch1': row1['Mismatches'],
-                                         'binding_pos_diff': amp_size, 'reference': row1['Subject ID']})
+                                         'binding_pos_diff': amp_size, 'reference': row1['Subject ID'], 'ref_region': str(row1['Binding Position']) + ", " + str(row2['Binding Position'])})
     return pd.DataFrame(compatible_pairs)
 
 with open(primer_seq, 'r') as infile, open(primer_seq+'.fasta', 'w') as outfile:
@@ -110,11 +110,36 @@ for i, row in blast_df.iterrows():
 
 blast_df = blast_df.rename(columns={'Query ID': 'Query Seq'})
 
-print("Writing output to " + out_file + '.tsv')
-amp_df = find_compatible_pairs(blast_df, max_len=max_amplicon_len)
-amp_df.to_csv(out_file + '.tsv', index=False, sep="\t")
 
+amp_df = find_compatible_pairs(blast_df, max_len=max_amplicon_len)
+print("Writing output to " + out_file + '.tsv')
+amp_df.to_csv(out_file + '.tsv', index=False, sep="\t")
 
 os.remove(primer_seq+'.fasta')
 os.remove("blast_output.txt")
+
+
+
+# get interactions
+amplicons = []
+ref_seq = SeqIO.read(ref_fasta_file, "fasta").seq
+for index, row in amp_df.iterrows():
+    ref_region = row['ref_region']
+    ref_start, ref_end = ref_region.split(",")
+    amplicon_seq = ref_seq[int(ref_start)-1:int(ref_end)]
+    amplicons.append({'amplicon_id': index, 'amplicon_seq': str(amplicon_seq)})
+
+
+tm_data = []
+for pair in itertools.combinations(amplicons, 2):
+    tm = MeltingTemp.Tm_NN(pair[0]['amplicon_seq'], pair[1]['amplicon_seq'], Na=salt_conc, saltcorr=7)
+    pair_str = str(pair[0]['amplicon_id']) + "," + str(pair[1]['amplicon_id'])
+    tm_data.append({'pair': pair_str, 'tm': str(tm)})
+
+tm_df = pd.DataFrame(tm_data)
+tm_df.to_csv(out_file + '_amplicon_interactions.tsv', index=False, sep="\t")
+
+
+
+
 

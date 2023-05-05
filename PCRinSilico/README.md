@@ -1,18 +1,3 @@
-Metadata-Version: 2.1
-Name: PCRinSilico
-Version: 0.0.13
-Summary: In silico PCR tool
-Home-page: https://github.com/SemiQuant/inSilicoPCR
-Author: Jason D Limberis
-Author-email: Jason.Limberis@ucsf.edu
-License: MIT
-Keywords: PCR,in silico PCR
-Platform: UNKNOWN
-Classifier: Programming Language :: Python :: 3
-Classifier: License :: OSI Approved :: MIT License
-Classifier: Operating System :: OS Independent
-Description-Content-Type: text/markdown
-
 # README
 
 ## In-Silico PCR tool
@@ -60,5 +45,3 @@ python inSilicoPCR.py \
 |:-----------------|------:|----:|:--------:|:----------------|------:|----:|:--------:|-------:|-------:|---------------:|---------------:|
 |gaacaccggcagtggttc|      1|   18|    +     |ctgccgcagcggt     |      1|   13|    -     |       0|       0|             300|example        |
 |accgagctgccggacggcac|      1|   20|    +     |ctgccgcagcggt     |      1|   13|    -     |       0|       0|             318|example      |
-
-
