@@ -15,9 +15,9 @@ This script takes a text file with primer sequence (one per line,optinal name in
 
 These may be installed by running
 
-'''
+```
 bash install.sh
-'''
+```
 
 ### Usage
 
