@@ -1,5 +1,5 @@
-gcgacgctggtcgt
-ctgccgcagcggt
-cgcgcagcacttcgt
-gaacaccggcagtggttc
-accgagctgccggacggcac
+gcgacgctggtcgt	sge_F
+ctgccgcagcggt	sge_R
+cgcgcagcacttcgt	kkd_F
+gaacaccggcagtggttc	kkd_F
+accgagctgccggacggcac	kkd_R

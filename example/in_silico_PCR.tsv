@@ -1,3 +1,3 @@
-qseq1	qstart1	qend1	direction1	mismatch2	qseq2	qstart2	qend2	direction2	mismatch1	binding_pos_diff	reference
-gaacaccggcagtggttc	1	18	+	0	ctgccgcagcggt	1	13	-	0	300	example
-accgagctgccggacggcac	1	20	+	0	ctgccgcagcggt	1	13	-	0	318	example
+qseq1	qseq2_input	qstart1	qend1	direction1	mismatch2	qseq2	qseq1_input	qstart2	qend2	direction2	mismatch1	binding_pos_diff	reference	ref_region
+kkd_F_2	gaacaccggcagtggttc	1	18	+	0	sge_R	ctgccgcagcggt	1	13	-	0	300	example	772, 1072
+kkd_R	accgagctgccggacggcac	1	20	+	0	sge_R	ctgccgcagcggt	1	13	-	0	318	example	772, 1090

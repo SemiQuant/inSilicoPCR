@@ -73,24 +73,40 @@ def find_compatible_pairs(blast_df, max_len):
         amp_size = abs(int(row1['Binding Position']) - int(row2['Binding Position']))
         if amp_size <= max_len and row1['Direction'] != row2['Direction'] and row1['Subject ID'] == row2['Subject ID']:
             if row1['Direction'] == '+':
-                compatible_pairs.append({'qseq1': row1['Query Seq'], 'qstart1': row1['Query Start'], 'qend1': row1['Query End'], 'direction1': row1['Direction'], 'mismatch1': row1['Mismatches'],
-                                         'qseq2': row2['Query Seq'], 'qstart2': row2['Query Start'], 'qend2': row2['Query End'], 'direction2': row2['Direction'], 'mismatch2': row2['Mismatches'],
+                compatible_pairs.append({'qseq1': row1['Query Seq'], 'qseq1_input': row1['Sequence'], 'qstart1': row1['Query Start'], 'qend1': row1['Query End'], 'direction1': row1['Direction'], 'mismatch1': row1['Mismatches'],
+                                         'qseq2': row2['Query Seq'], 'qseq2_input': row2['Sequence'], 'qstart2': row2['Query Start'], 'qend2': row2['Query End'], 'direction2': row2['Direction'], 'mismatch2': row2['Mismatches'],
                                          'binding_pos_diff': amp_size, 'reference': row1['Subject ID'], 'ref_region': str(row2['Binding Position']) + ", " + str(row1['Binding Position'])})
             else:
-                compatible_pairs.append({'qseq1': row2['Query Seq'], 'qstart1': row2['Query Start'], 'qend1': row2['Query End'], 'direction1': row2['Direction'], 'mismatch2': row2['Mismatches'],
-                                         'qseq2': row1['Query Seq'], 'qstart2': row1['Query Start'], 'qend2': row1['Query End'], 'direction2': row1['Direction'], 'mismatch1': row1['Mismatches'],
+                compatible_pairs.append({'qseq1': row2['Query Seq'], 'qseq2_input': row2['Sequence'], 'qstart1': row2['Query Start'], 'qend1': row2['Query End'], 'direction1': row2['Direction'], 'mismatch2': row2['Mismatches'],
+                                         'qseq2': row1['Query Seq'], 'qseq1_input': row1['Sequence'], 'qstart2': row1['Query Start'], 'qend2': row1['Query End'], 'direction2': row1['Direction'], 'mismatch1': row1['Mismatches'],
                                          'binding_pos_diff': amp_size, 'reference': row1['Subject ID'], 'ref_region': str(row1['Binding Position']) + ", " + str(row2['Binding Position'])})
     return pd.DataFrame(compatible_pairs)
 
 with open(primer_seq, 'r') as infile, open(primer_seq+'.fasta', 'w') as outfile:
-    # Set a counter to generate unique sequence names
-    i = 1
+    # Initialize a dictionary to keep track of sequence names
+    seen_names = {}
     for line in infile:
-        # Remove any leading/trailing whitespace from the sequence
-        sequence = line.strip()
-        # Generate a unique sequence name
-        name = f'sequence{i}'
-        i += 1
+        columns = line.strip().split('\t')
+        if len(columns) == 1:
+            # Remove any leading/trailing whitespace from the sequence
+            sequence = line.strip()
+            # Generate a unique sequence name
+            name = f'sequence{i}'
+        else:
+            sequence, name = columns
+        # Check if the name has already been used
+        if name in seen_names:
+            # Increment the count for this name
+            count = seen_names[name] + 1
+            # Generate a new name by appending the count to the original name
+            new_name = f'{name}_{count}'
+            # Update the dictionary with the new count
+            seen_names[name] = count
+            # Use the new name for the sequence
+            name = new_name
+        else:
+            # Add the name to the dictionary with a count of 1
+            seen_names[name] = 1
         # Write the sequence to the output file in FASTA format
         outfile.write(f'>{name}\n{sequence}\n')
         
@@ -99,17 +115,16 @@ blast_df = find_binding_positions(primer_seq+'.fasta', ref_fasta_file, annealing
 # Read in the FASTA file as a dictionary of SeqRecord objects
 fasta_dict = SeqIO.to_dict(SeqIO.parse(primer_seq+'.fasta', "fasta"))
 
-# Iterate through the rows of the DataFrame and replace the Query IDs with sequences
+# Iterate through the rows of the DataFrame and replace the add primer with sequences
 for i, row in blast_df.iterrows():
     query_id = row["Query ID"]
     if query_id in fasta_dict:
         sequence = str(fasta_dict[query_id].seq)
-        blast_df.at[i, "Query ID"] = sequence
+        blast_df.at[i, "Sequence"] = sequence
     else:
-        blast_df.at[i, "Query ID"] = ""
+        blast_df.at[i, "Sequence"] = ""
 
 blast_df = blast_df.rename(columns={'Query ID': 'Query Seq'})
-
 
 amp_df = find_compatible_pairs(blast_df, max_len=max_amplicon_len)
 print("Writing output to " + out_file + '.tsv')
@@ -127,16 +142,32 @@ for index, row in amp_df.iterrows():
     ref_region = row['ref_region']
     ref_start, ref_end = ref_region.split(",")
     amplicon_seq = ref_seq[int(ref_start)-1:int(ref_end)]
-    amplicons.append({'amplicon_id': index, 'amplicon_seq': str(amplicon_seq)})
+    #add in the primer sequences
+    if row['direction1'] == '-':
+        pf_seq = Seq(row['qseq1'])
+        pf_seq = str(pf_seq.reverse_complement())
+    else:
+        pf_seq = Seq(row['qseq1'])
+    if row['direction2'] == '-':
+        pr_seq = Seq(row['qseq2'])
+        pr_seq = str(pf_seq.reverse_complement())
+    else:
+        pr_seq = Seq(row['qseq2'])
+    amplicon_seq = str(pf_seq) + str(amplicon_seq) + str(pr_seq)
+    amplicons.append({'Forward_primer':  row['qseq1'], 'Reverse_primer':  row['qseq2'], 'amplicon_seq': amplicon_seq})
 
 
 tm_data = []
 for pair in itertools.combinations(amplicons, 2):
     tm = MeltingTemp.Tm_NN(pair[0]['amplicon_seq'], pair[1]['amplicon_seq'], Na=salt_conc, saltcorr=7)
-    pair_str = str(pair[0]['amplicon_id']) + "," + str(pair[1]['amplicon_id'])
-    tm_data.append({'pair': pair_str, 'tm': str(tm)})
+    tm_data.append({    "amplicon1_PF": pair[0]['Forward_primer'],
+    "amplicon1_PR": pair[0]['Reverse_primer'],
+    "amplicon2_PF": pair[1]['Forward_primer'],
+    "amplicon2_PR": pair[1]['Reverse_primer'], 
+    'tm': str(tm)})
 
 tm_df = pd.DataFrame(tm_data)
+print("Writing output to " + out_file + '_amplicon_interactions.tsv')
 tm_df.to_csv(out_file + '_amplicon_interactions.tsv', index=False, sep="\t")
 
 

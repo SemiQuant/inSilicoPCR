@@ -4,7 +4,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7882322.svg)](https://doi.org/10.5281/zenodo.7882322)
 
-This script takes a text file with primer sequence (one per line) and a reference FASTA file as input and identifies primer pairs which amplify a DNA sequence of length less than or equal to a user-specified maximum, at a given Tm and salt concentration. The script outputs the sequences of the primers, the portion of the primer that binds, the number of mismatches, as well as the start and end coordinates of the amplified sequence. It also outputs the Tm of the amplicons and the Tm of amplicon pairs.
+This script takes a text file with primer sequence (one per line,optinal name in column 2, tab-seperated) and a reference FASTA file as input and identifies primer pairs which amplify a DNA sequence of length less than or equal to a user-specified maximum, at a given Tm and salt concentration. The script outputs the sequences of the primers, the portion of the primer that binds, the number of mismatches, as well as the start and end coordinates of the amplified sequence. It also outputs the Tm of the amplicons and the Tm of amplicon pairs.
 
 ### Dependencies
 
@@ -40,12 +40,16 @@ python inSilicoPCR.py \
    --ref_fasta_file  ./example/ref.fasta
 ```
 
+#### in_silico_PCR.tsv
+| qseq1   | qseq2_input          | qstart1 | qend1 | direction1 | mismatch2 | qseq2 | qseq1_input   | qstart2 | qend2 | direction2 | mismatch1 | binding_pos_diff | reference | ref_region |
+|---------|----------------------|---------|-------|------------|-----------|-------|---------------|---------|-------|------------|-----------|------------------|-----------|------------|
+| kkd_F_2 | gaacaccggcagtggttc   | 1       | 18    | +          | 0         | sge_R | ctgccgcagcggt | 1       | 13    | -          | 0         | 300              | example   | 772, 1072  |
+| kkd_R   | accgagctgccggacggcac | 1       | 20    | +          | 0         | sge_R | ctgccgcagcggt | 1       | 13    | -          | 0         | 318              | example   | 772, 1090  |
 
-|qseq1             |qstart1|qend1|direction1|qseq2            |qstart2|qend2|direction2|mismatch1|mismatch2|binding_pos_diff|reference|
-|:-----------------|------:|----:|:--------:|:----------------|------:|----:|:--------:|-------:|-------:|---------------:|---------------:|
-|gaacaccggcagtggttc|      1|   18|    +     |ctgccgcagcggt     |      1|   13|    -     |       0|       0|             300|example        |
-|accgagctgccggacggcac|      1|   20|    +     |ctgccgcagcggt     |      1|   13|    -     |       0|       0|             318|example      |
 
+#### in_silico_PCR_amplicon_interactions.tsv
+| amplicon1_PF | amplicon1_PR | amplicon2_PF | amplicon2_PR | tm          |
+|--------------|--------------|--------------|--------------|-------------|
+| kkd_F_2      | sge_R        | kkd_R        | sge_R        | 90.22726832 |
 
-<!-- [Watch the video](geneblaze.gif") -->
 
