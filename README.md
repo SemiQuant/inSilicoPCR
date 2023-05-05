@@ -13,6 +13,11 @@ This script takes a text file with primer sequence (one per line,optinal name in
 -   [pandas](https://pandas.pydata.org/)
 -   [BLAST+](https://www.ncbi.nlm.nih.gov/books/NBK569861/)
 
+These may be installed by running
+'''
+bash install.sh
+'''
+
 ### Usage
 
 ```
