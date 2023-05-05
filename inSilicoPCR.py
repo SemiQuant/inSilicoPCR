@@ -85,23 +85,27 @@ def find_compatible_pairs(blast_df, max_len):
 def find_oligo_dimers(fasta_file, temp, salt_conc):
     # Read in the fasta sequences
     seq_records = list(SeqIO.parse(fasta_file, "fasta"))
-    
-    # Create a list to hold the dimer pairs
-    dimer_pairs = []
-    
+
+    # Create a list to hold the dimer pairs and melting temperatures
+    dimers = []
+    melting_temps = []
+
     # Loop through all possible pairs of sequences
-    for seq1, seq2 in combinations(seq_records, 2):
+    for seq1, seq2 in itertools.combinations(seq_records, 2):
         # Calculate the melting temperature of the dimer
         dimer_tm = MeltingTemp.Tm_NN(str(seq1.seq + seq2.seq), nn_table=MeltingTemp.DNA_NN4, Na=salt_conc, saltcorr=7)
-        
+
         # Check if the dimer's melting temperature is above the given temperature
         if dimer_tm > temp:
-            # Add the dimer's name to the list of dimer pairs
-            dimer_pairs.append((seq1.id, seq2.id))
+            # Add the dimer's names and melting temperature to the lists
+            dimers.append((seq1.id, seq2.id))
+            melting_temps.append(dimer_tm)
+
     # Create a pandas dataframe from the dimer pairs and melting temperatures
     df = pd.DataFrame({'Sequence1': [d[0] for d in dimers],
                        'Sequence2': [d[1] for d in dimers],
-                       'MeltingTemp': melting_temps})
+                       'MeltingTemp': round(melting_temps, 0)})
+
     return df
 
 with open(primer_seq, 'r') as infile, open(primer_seq+'.fasta', 'w') as outfile:
@@ -137,7 +141,7 @@ with open(primer_seq, 'r') as infile, open(primer_seq+'.fasta', 'w') as outfile:
 dimers = find_oligo_dimers(primer_seq+'.fasta', annealing_temp, salt_conc)
 print("Writing output to " + out_file + '_primer_dimears.tsv')
 dimers.to_csv(out_file + '_primer_dimears.tsv', index=False, sep="\t")
-        
+
 blast_df = find_binding_positions(primer_seq+'.fasta', ref_fasta_file, annealing_temp, req_five, salt_conc)
 
 # Read in the FASTA file as a dictionary of SeqRecord objects

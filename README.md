@@ -53,3 +53,16 @@ python inSilicoPCR.py \
 | kkd_F_2      | sge_R        | kkd_R        | sge_R        | 90.22726832 |
 
 
+#### in_silico_PCR_primer_dimears.tsv
+| Sequence1 | Sequence2 | MeltingTemp       |
+|-----------|-----------|-------------------|
+| sge_F     | sge_R     | 75  |
+| sge_F     | kkd_F     | 72 |
+| sge_F     | kkd_F_2   | 73  |
+| sge_F     | kkd_R     | 79 |
+| sge_R     | kkd_F     | 74  |
+| sge_R     | kkd_F_2   | 74 |
+| sge_R     | kkd_R     | 80 |
+| kkd_F     | kkd_F_2   | 72  |
+| kkd_F     | kkd_R     | 78 |
+| kkd_F_2   | kkd_R     | 78 |
