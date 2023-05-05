@@ -14,6 +14,7 @@ This script takes a text file with primer sequence (one per line,optinal name in
 -   [BLAST+](https://www.ncbi.nlm.nih.gov/books/NBK569861/)
 
 These may be installed by running
+
 '''
 bash install.sh
 '''
