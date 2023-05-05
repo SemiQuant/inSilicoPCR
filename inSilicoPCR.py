@@ -82,6 +82,28 @@ def find_compatible_pairs(blast_df, max_len):
                                          'binding_pos_diff': amp_size, 'reference': row1['Subject ID'], 'ref_region': str(row1['Binding Position']) + ", " + str(row2['Binding Position'])})
     return pd.DataFrame(compatible_pairs)
 
+def find_oligo_dimers(fasta_file, temp, salt_conc):
+    # Read in the fasta sequences
+    seq_records = list(SeqIO.parse(fasta_file, "fasta"))
+    
+    # Create a list to hold the dimer pairs
+    dimer_pairs = []
+    
+    # Loop through all possible pairs of sequences
+    for seq1, seq2 in combinations(seq_records, 2):
+        # Calculate the melting temperature of the dimer
+        dimer_tm = MeltingTemp.Tm_NN(str(seq1.seq + seq2.seq), nn_table=MeltingTemp.DNA_NN4, Na=salt_conc, saltcorr=7)
+        
+        # Check if the dimer's melting temperature is above the given temperature
+        if dimer_tm > temp:
+            # Add the dimer's name to the list of dimer pairs
+            dimer_pairs.append((seq1.id, seq2.id))
+    # Create a pandas dataframe from the dimer pairs and melting temperatures
+    df = pd.DataFrame({'Sequence1': [d[0] for d in dimers],
+                       'Sequence2': [d[1] for d in dimers],
+                       'MeltingTemp': melting_temps})
+    return df
+
 with open(primer_seq, 'r') as infile, open(primer_seq+'.fasta', 'w') as outfile:
     # Initialize a dictionary to keep track of sequence names
     seen_names = {}
@@ -109,6 +131,12 @@ with open(primer_seq, 'r') as infile, open(primer_seq+'.fasta', 'w') as outfile:
             seen_names[name] = 1
         # Write the sequence to the output file in FASTA format
         outfile.write(f'>{name}\n{sequence}\n')
+
+
+# primer dimers
+dimers = find_oligo_dimers(primer_seq+'.fasta', annealing_temp, salt_conc)
+print("Writing output to " + out_file + '_primer_dimears.tsv')
+dimers.to_csv(out_file + '_primer_dimears.tsv', index=False, sep="\t")
         
 blast_df = find_binding_positions(primer_seq+'.fasta', ref_fasta_file, annealing_temp, req_five, salt_conc)
 
