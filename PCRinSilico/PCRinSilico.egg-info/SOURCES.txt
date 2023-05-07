@@ -1,8 +1,0 @@
-README.md
-in_silico_pcr.py
-setup.py
-PCRinSilico.egg-info/PKG-INFO
-PCRinSilico.egg-info/SOURCES.txt
-PCRinSilico.egg-info/dependency_links.txt
-PCRinSilico.egg-info/requires.txt
-PCRinSilico.egg-info/top_level.txt

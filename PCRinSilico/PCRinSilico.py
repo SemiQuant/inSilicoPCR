@@ -113,9 +113,11 @@ def is_valid_dna_sequence(sequence):
     valid_chars = set('ACGTN')
     return all(char in valid_chars for char in sequence.upper())
 
+i=0
 with open(primer_seq, 'r') as infile, open(primer_seq+'.fasta', 'w') as outfile:
     # Initialize a dictionary to keep track of sequence names
     seen_names = {}
+    i+=1
     for line in infile:
         columns = line.strip().split('\t')
         if len(columns) == 1:

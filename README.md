@@ -16,13 +16,13 @@ This script takes a text file with primer sequence (one per line,optinal name in
 These may be installed by running
 
 ```
-bash install.sh
+pip install PCRinSilico
 ```
 
 ### Usage
 
 ```
-python inSilicoPCR.py [options]
+PCRinSilico [options]
    --primer_seq [path to primer sequence file, one primer per line]
    --ref_fasta_file [path to reference FASTA file]
 ```
@@ -41,7 +41,7 @@ python inSilicoPCR.py [options]
 ### Example
 
 ```
-python inSilicoPCR.py \
+PCRinSilico \
    --primer_seq ./example/primers.txt \
    --ref_fasta_file  ./example/ref.fasta
 ```
